@@ -1,0 +1,11 @@
+It uses ExtJs javascript library (http://extjs.com/) - please download, and
+correct links to extjs resources in index.php
+It is not finished,.... simply wanted a way to show what is a progress and
+watch code development.
+I need to try and customize chats. But I feel a need to construct for testing
+some typical environment like user accounts/profiles, login/logout/signon
+facilities, and some imitation of game sessions, to be able to check, if
+channels and rooms are set up correctly. So I spend efforts to construct that
+toy, and to have some fun and be knowledgable of ExtJs, which I like, I use
+that very worthy javascript framework.
+
