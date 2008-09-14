@@ -32,3 +32,31 @@
 #start_btn {
     margin-left: 15px;
 }
+#not_registered {
+    color: #008B8B;
+    margin-top: 10px;
+    text-align: center;
+}
+.tiny {
+  font-family:verdana,arial,helvetica,sans-serif;
+  font-size:xx-small;
+}
+#authorized {
+    float: right;
+    display: none;
+    width: auto;
+    margin-right: 15px;
+}
+/***** Tables *****/ /* Tables should be inside a div with class table-box. * The table itself should be of class properties or class listing, depending on whether it's * a two-column properties tables, or a multi-column listing. */ 
+.table-box { 
+    border: 1px solid #8D9FA5; clear: both; /*margin: 20px 0; */
+    padding: 15px 15px 10px 15px; width:420px; 
+}
+.table-box th, .table-box td {
+    border: none; padding: 4px 8px; text-align: left; 
+}
+.table-box h3 {
+    background-color: #fff; color: #000; font-size: 14px; margin: 0 0 -24px 0;
+    padding: 0 13px 0 6px; position: relative; float: left; top: -26px; 
+    width: auto; 
+}

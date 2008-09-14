@@ -42,7 +42,7 @@ function user_authenticate($name, $pass) {
   global $user;
 
   // Try to log in the user locally. Don't set $user unless successful.
-  if ( $account = user_load(array('username' => $name, 'encryptedPassword' => $pass))) {
+  if ( $account = user_load(array('username' => $name, 'pass' => $pass))) {
       $user = $account;
   }
   else {

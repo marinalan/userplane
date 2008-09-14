@@ -15,4 +15,3 @@
 
     $_SESSION['room'] = $room_id;
     echo json_encode( array('room_id' => $room_id, 'channel' => $_POST['game_name'].'_'.$room_id) );
-$room_idu

@@ -1,5 +1,7 @@
-Ext.namespace('game', 'game.chat');
+Ext.namespace('game', 'game.chat', 'game.login', 'game.signon');
 game.prepared = false;
+game.login.prepared = false;
+game.signon.prepared = false;
 
 Ext.apply(Ext.form.VTypes, {
   password: function(val, field) {
@@ -14,120 +16,143 @@ Ext.apply(Ext.form.VTypes, {
 });
 
 game.show_login_form = function(){
-  var loginf = new Ext.FormPanel({
-    id:  'login_form',
-    url: 'login.php',
-    labelWidth: 125,
-    frame: true,
-    title: 'Login',
-    bodyStyle:'padding:5px 5px 0',
-    width: 350,
-    cls: 'middle',
-    defaults: {
-      width: 175,
-    },
-    defaultType: 'textfield',
-    items: [{
-      fieldLabel: 'Username',
-      name: 'username',
-      id: 'username'
-    },{
-      fieldLabel: 'Password',
-      name: 'pass',
-      id: 'pass' // id of the initial password field
-    }],
+  if (!game.login.prepared){  
+    var loginf = new Ext.FormPanel({
+      id:  'login_form',
+      url: 'login.php',
+      labelWidth: 125,
+      frame: true,
+      bodyStyle:'padding:5px 5px 0',
+      width: 400,
+      cls: 'middle',
+      defaults: {
+        width: 175,
+      },
+      defaultType: 'textfield',
+      items: [{
+        fieldLabel: 'Username',
+        name: 'username',
+        id: 'login_username'
+      },{
+        fieldLabel: 'Password',
+        name: 'pass',
+        inputType: 'password',
+        id: 'login_pass' // id of the initial password field
+      }],
 
-    buttons: [{
-      text: 'Login'
-    }]    
-    
-  });
+      buttons: [{
+        text: 'Login',
+        handler: function(){
+          loginf.getForm().submit({
+            url: 'login.php',
+            /*waitMsg:'Saving Data...',*/
+            success: function(response){
+              game.chat.step = 'pick_game';
+              // Ext.destroy(Ext.getCmp('login_form'));
+              Ext.get('login').replaceClass('step_active', 'step');
 
-  loginf.render('logincnt');
-   Ext.get('register').on('click', function(){
-       game.chat.step = 'sign_on';
-       Ext.destroy(Ext.getCmp('login_form'));
-       Ext.get('login').replaceClass('step_active', 'step');
+              Ext.get('authorized').setVisibilityMode(Element.DISPLAY).setVisible(true);
 
-       game.show_registration_form();
-  });
+              game.show_pick_game_form();
+            }});
+        }
+      }]    
+      
+    });
+
+    loginf.render('logincnt');
+    Ext.get('register').on('click', function(){
+         game.chat.step = 'sign_on';
+         Ext.get('login').replaceClass('step_active', 'step');
+
+         game.show_registration_form();
+    });
+    game.login.prepared = true;
+  }
 
   Ext.get('login').replaceClass('step', 'step_active');
 };
 
 game.show_registration_form = function(){
-  var signonf = new Ext.FormPanel({
-      labelWidth: 110, // label settings here cascade unless overridden
-      url:'save_user.php',
-      id: 'register_form',
-      frame:true,
-      title: 'Registration',
-      bodyStyle:'padding:5px 5px 0',
-      cls: 'middle',
-      width: 400,
-      defaults: {width: 230},
-      defaultType: 'textfield',
+  if (!game.signon.prepared){  
+    var signonf = new Ext.FormPanel({
+        labelWidth: 110, // label settings here cascade unless overridden
+        url:'save_user.php',
+        id: 'register_form',
+        frame:true,
+        bodyStyle:'padding:5px 5px 0',
+        cls: 'middle',
+        width: 400,
+        defaults: {width: 230},
+        defaultType: 'textfield',
 
-      items: [{
-              fieldLabel: 'Username',
-              name: 'username',
-              allowBlank:false
-          },{
-              fieldLabel: 'Password',
-              name: 'pass',
-              id: 'pass',
-              allowBlank:false,
-              inputType: 'password'
-          },{
-              fieldLabel: 'Confirm Password',
-              name: 'pass-cfrm',
-              inputType: 'password',
-              /*vtype: 'password',*/
-              initialPassField: 'pass' // id of the initial password field
-          },{
-              fieldLabel: 'Email',
-              name: 'email',
-              allowBlank:false,
-              vtype:'email'
-          },{
-              fieldLabel: 'Phone',
-              name: 'phone'
-          },{
-              fieldLabel: 'Full Name',
-              name: 'name'
-          },{
-              fieldLabel: 'Location',
-              name: 'location'
-          }, new Ext.form.DateField({
-              fieldLabel: 'Date of Birth',
-              name: 'birthday',
-              width:190,
-              allowBlank:false
-          })
-      ],
+        items: [{
+                fieldLabel: 'Username',
+                name: 'username',
+                allowBlank:false
+            },{
+                fieldLabel: 'Password',
+                name: 'pass',
+                id: 'pass',
+                allowBlank:false,
+                inputType: 'password'
+            },{
+                fieldLabel: 'Confirm Password',
+                name: 'pass-cfrm',
+                inputType: 'password',
+                /*vtype: 'password',*/
+                initialPassField: 'pass' // id of the initial password field
+            },{
+                fieldLabel: 'Email',
+                name: 'email',
+                allowBlank:false,
+                vtype:'email'
+            },{
+                fieldLabel: 'Phone',
+                name: 'phone'
+            },{
+                fieldLabel: 'Full Name',
+                name: 'name'
+            },{
+                fieldLabel: 'Location',
+                name: 'location'
+            }, new Ext.form.DateField({
+                fieldLabel: 'Date of Birth',
+                name: 'birthday',
+                width:190,
+                allowBlank:false
+            })
+        ],
 
-      buttons: [{
-          text: 'Save',
-          handler: function(){
-            signonf.getForm().submit({
-              url: 'save_user.php',
-              /*waitMsg:'Saving Data...',*/
-              success: function(response){
-                game.chat.step = 'pick_game';
-                Ext.destroy(Ext.getCmp('register_form'));
-                Ext.get('login').replaceClass('step_active', 'step');
+        buttons: [{
+            text: 'Save',
+            handler: function(){
+              signonf.getForm().submit({
+                url: 'save_user.php',
+                /*waitMsg:'Saving Data...',*/
+                success: function(response){
+                  game.chat.step = 'pick_game';
+                  //Ext.destroy(Ext.getCmp('register_form'));
+                  Ext.get('sign_on').replaceClass('step_active', 'step');
 
-                game.show_pick_game_form();
-              }});
-          }
-      },{
-          text: 'Reset',
-          handler: function(){
-          }
-      }]
-  });
+                  game.show_pick_game_form();
+                }});
+            }
+        },{
+            text: 'Reset',
+            handler: function(){
+            }
+        }]
+    });
 
-  signonf.render('sign_on');
+    signonf.render('signoncnt');  
+    Ext.get('login_link').on('click', function(){
+         game.chat.step = 'login';
+         Ext.get('sign_on').replaceClass('step_active', 'step');
+         game.show_login_form();
+    });
+    game.signon.prepared = true;
+  }
   Ext.get('sign_on').replaceClass('step', 'step_active');
 };
 

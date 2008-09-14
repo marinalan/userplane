@@ -23,10 +23,10 @@
 <head>
 	<title>Game Simulator Userplane evaluation</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-    <link rel="stylesheet" type="text/css" href="../ext-2.1/resources/css/ext-all.css" />
+    <link rel="stylesheet" type="text/css" href="../ext-2.2/resources/css/ext-all.css" />
     <link rel="stylesheet" type="text/css" href="game_chat.css" />
- 	<script type="text/javascript" src="../ext-2.1/adapter/ext/ext-base.js"></script>
-    <script type="text/javascript" src="../ext-2.1/ext-all-debug.js"></script>
+ 	<script type="text/javascript" src="../ext-2.2/adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="../ext-2.2/ext-all-debug.js"></script>
     <script type="text/javascript" src="game_chat.js"></script>
     <script type="text/javascript" src="flashobject.js"></script>
 	<script language="JavaScript">
@@ -149,13 +149,23 @@ show_chat = function(){
 
 <body>
 	<h3 id="title">Chat:</h3>
-    <div style="text-align:center;" align="center"> 
+    <div id="authorized" class="tiny"><span id="greeting"></span>
+        <a href="javascript:void(0)" id="logout">Sign Out</a></div>
+    <div style="text-align:center; margin-bottom: 15px;" align="center"> 
     <iframe id="ads" src="http://cache.static.userplane.com/subtracts/adframes/int_frameset.html?app=wc&zoneID=4078&textZoneID=193&clickID=a0f27b3d&t=364237&domainid=<?php echo( $strDomainID ); ?>&asl=ENTER_ASL_HERE" name="Banner" scrolling="NO" width="728" height="130" frameborder="0"></iframe></div>
 <div id="login" class="step">
-   <div id="logincnt"></div>
-   <div id="not_registered">Not Registered Yet? <a href="javascript:void(0)" id="register">Sign On</a></div>
+   <div class="table-box middle">
+     <h3>Please login or <a style="color:blue;" href="#" id="register">sign-up</a> for an account 
+     </h3>
+     <div id="logincnt"></div>
+   </div>
 </div>
 <div id="sign_on" class="step">
+   <div class="table-box middle">
+     <h3>Please <a style="color:blue;" href="#" id="login_link">login</a> or sign-up for an account
+     </h3>
+     <div id="signoncnt"></div>
+   </div> 
 </div>
 <div id="pick_game" class="step">
     <div id="game_form">
