@@ -4,6 +4,7 @@
     require_once 'user.inc';
     require_once 'session.inc';
     require_once 'game.inc';
+    require_once 'meebo_rooms_lib.php';
 
 	/*
 	 *	You need to set these variables to be appropriate for your site and user.
@@ -136,10 +137,10 @@ show_chat = function(){
     if (!isset($user) || $user->user_id == 0){ ?> game.chat.step = 'login';
 <?php
     }
-    else if (!isset($_SESSION['game'])){ ?>    game.chat.step = 'pick_game';
+    else if (!isset($_SESSION['game'])){ ?>    game.chat.step = 'pick_channel';
 <?php
     }
-    else { ?>                                  game.chat.step = 'play'; 
+    else { ?>                                  game.chat.step = 'talk'; 
 <?php 
     }
 ?>
@@ -174,8 +175,18 @@ show_chat = function(){
     </tr></table>
     </div>
 </div>
+<div id="pick_channel" class="step">
+    <div id="channel_form">
+    <table><tr>
+    <td width="250px"><input type="text" id="channels-with-qtip" size="30"/></td>
+    <td><span id="join_talk_btn"></span></td>
+    </tr></table>
+    </div>
+</div>
 <div id="flashcontent" class="step">
 	<strong>You need to upgrade your Flash Player by clicking <a href="http://www.macromedia.com/go/getflash/" target="_blank">this link</a>.</strong><br><br><strong>If you see this and have already upgraded we suggest you follow <a href="http://www.adobe.com/cfusion/knowledgebase/index.cfm?id=tn_14157" target="_blank">this link</a> to uninstall Flash and reinstall again.</strong>
+</div>
+<div id="meebo_chat" class="step">
 </div>
 </body>
 </html>

@@ -1,7 +1,22 @@
-Ext.namespace('game', 'game.chat', 'game.login', 'game.signon');
+Ext.namespace('game', 'game.chat', 'game.login', 'game.signon', 
+              'game.channel', 'game.meebo');
 game.prepared = false;
 game.login.prepared = false;
 game.signon.prepared = false;
+game.channel.prepared = false;
+
+game.meebo.tpl = new Ext.XTemplate(
+    '<div style="width:{w}px; margin:2px auto">',
+    '  <object width="{w}" height="{h}">',
+    '    <param name="movie" value="http://widget.meebo.com/mcr.swf?id={widget}"></param>',
+    '    <embed src="http://widget.meebo.com/mcr.swf?id={widget}"',
+    '      type="application/x-shockwave-flash" width="{w}" height="{h}" />',
+    '  </object>',
+    '  <a href="http://www.meebo.com/rooms" class="mcrmeebo">',
+    '  <img alt="http://www.meebo.com/rooms" src="http://widget.meebo.com/b.gif"',
+    '      width="{w}" height="45" style="border:0px"/>',
+    '  </a>',
+    '</div>'); 
 
 Ext.apply(Ext.form.VTypes, {
   password: function(val, field) {
@@ -47,13 +62,12 @@ game.show_login_form = function(){
             url: 'login.php',
             /*waitMsg:'Saving Data...',*/
             success: function(response){
-              game.chat.step = 'pick_game';
+              game.chat.step = 'pick_channel';
               // Ext.destroy(Ext.getCmp('login_form'));
               Ext.get('login').replaceClass('step_active', 'step');
+              Ext.get('authorized').setVisible(true);
 
-              Ext.get('authorized').setVisibilityMode(Element.DISPLAY).setVisible(true);
-
-              game.show_pick_game_form();
+              game.show_pick_channel_form();
             }});
         }
       }]    
@@ -71,6 +85,7 @@ game.show_login_form = function(){
   }
 
   Ext.get('login').replaceClass('step', 'step_active');
+  Ext.get('authorized').setVisible(false);
 };
 
 game.show_registration_form = function(){
@@ -131,11 +146,11 @@ game.show_registration_form = function(){
                 url: 'save_user.php',
                 /*waitMsg:'Saving Data...',*/
                 success: function(response){
-                  game.chat.step = 'pick_game';
+                  game.chat.step = 'pick_channel';
                   //Ext.destroy(Ext.getCmp('register_form'));
                   Ext.get('sign_on').replaceClass('step_active', 'step');
 
-                  game.show_pick_game_form();
+                  game.show_pick_channel_form();
                 }});
             }
         },{
@@ -154,7 +169,105 @@ game.show_registration_form = function(){
     game.signon.prepared = true;
   }
   Ext.get('sign_on').replaceClass('step', 'step_active');
+  Ext.get('authorized').setVisible(false);
 };
+
+game.show_pick_channel_form = function(){
+  if (!game.channel.prepared){  
+    var ds = new Ext.data.Store({  
+        proxy: new Ext.data.HttpProxy({  
+            // this json data contains only employees where active is 'true'  
+            url: 'channel_combobox_data.php'  
+        }),  
+        reader: new Ext.data.JsonReader({
+          idProperty:'node',
+          root: 'data', 
+          totalProperty: 'results',
+          fields: [
+              {name: 'node', type: 'string'},
+              {name: 'room', type: 'string'},
+              {name: 'desc', type: 'string'} 
+          ]
+        }),  
+        remoteSort: true  
+    });
+    ds.load();
+
+    var comboWithTooltip = new Ext.form.ComboBox({
+        tpl: '<tpl for="."><div ext:qtip="{desc}" class="x-combo-list-item">{room}</div></tpl>',
+        store: ds,
+        id: 'chosen_channel',
+        listClass: 'games_list',
+        listWidth: 250, 
+        valueField: 'node',
+        displayField:'room',
+        hiddenName: 'node',
+        typeAhead: true,
+        mode: 'remote',
+        triggerAction: 'all',
+        emptyText:'Select a channel...',
+        selectOnFocus:true,
+        applyTo: 'channels-with-qtip',
+        listeners: {
+          select:{
+             fn: function(combo, value){
+               game.meebo_node = value.data.node;
+               game.meebo_room = value.data.room;
+               JoinTalkBtn.show();
+             }
+          }/*,
+          keydown:{
+             fn: function(combo, value){
+               JoinGameBtn.hide();
+             }
+          }*/
+        }
+    });
+   
+    var embed_meebo_widget = function(){
+      var conn = new Ext.data.Connection();
+      conn.request({
+        url: 'embed_meebo_widget.php',
+        method: 'POST',
+        params: {meebo_node: game.meebo_node},
+        success: function(response) {
+          if (window.console){
+            console.log(response.responseText);
+          }
+		  var json = Ext.decode(response.responseText);
+          if (json.stat == 'ok'){
+            Ext.get('pick_channel').replaceClass('step_active', 'step');
+            game.show_meebo_widget(json.data);
+          }
+        },
+        failure: function() {
+          Ext.Msg.alert('Status', 'Unable to meebo widget. Please try again later.');
+        }
+      });
+    }
+
+    var JoinTalkBtn = new Ext.Button({
+        text: 'Join Talk',
+        renderTo: 'join_talk_btn',
+        hidden: true,
+        style: {display: "inline"},
+        handler: function(){
+          embed_meebo_widget();
+        }
+    });
+    
+    game.channel.prepared = true;
+  }
+
+  Ext.get('pick_channel').replaceClass('step', 'step_active');
+  Ext.get('authorized').setVisible(true);
+};
+
+game.show_meebo_widget = function(meebo_data){
+	game.meebo.tpl.overwrite('meebo_chat', meebo_data);
+  Ext.get('pick_channel').replaceClass('step_active', 'step');
+  Ext.get('meebo_chat').replaceClass('step', 'step_active');
+}
 
 game.show_pick_game_form = function(){
   if (!game.prepared){  
@@ -244,6 +357,7 @@ game.show_pick_game_form = function(){
   }
     
   Ext.get('pick_game').replaceClass('step', 'step_active');
+  Ext.get('authorized').setVisible(true);
 };
 
 Ext.onReady(function(){
@@ -251,6 +365,24 @@ Ext.onReady(function(){
     Ext.QuickTips.init();
     // turn on validation errors beside the field globally
     Ext.form.Field.prototype.msgTarget = 'side';
+    Ext.get('authorized').setVisibilityMode(Element.DISPLAY);
+
+    Ext.get('logout').on('click', function(){
+      var conn = new Ext.data.Connection();
+      conn.request({
+        url: 'logout.php',
+        method: 'GET',
+        success: function(responseObject) {
+          if (window.console){
+            console.log(responseObject.responseText);
+          }
+          game.chat.step = 'login';
+          Ext.select('div.step_active').replaceClass('step_active', 'step');
+          //Ext.get('sign_on').replaceClass('step_active', 'step');
+          game.show_login_form();
+        }
+      });
+    });
 
     if (game.chat.step == 'login') {
       game.show_login_form();
@@ -260,6 +392,9 @@ Ext.onReady(function(){
     }
     else if (game.chat.step == 'pick_game') {
       game.show_pick_game_form();
+    }
+    else if (game.chat.step == 'pick_channel') {
+      game.show_pick_channel_form();
     }
     else {
       show_chat();

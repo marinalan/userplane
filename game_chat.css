@@ -20,7 +20,7 @@
 .games_list {
     width: 200px;
 }
-#game_form {
+#game_form, #channel_form {
     margin: 2px auto 2px auto;
     width: 500px;
 }
@@ -59,4 +59,10 @@
     background-color: #fff; color: #000; font-size: 14px; margin: 0 0 -24px 0;
     padding: 0 13px 0 6px; position: relative; float: left; top: -26px; 
     width: auto; 
+}
+.mcrmeebo { 
+  display: block; background:url("http://widget.meebo.com/r.gif") no-repeat top right; 
+}
+.mcrmeebo:hover { 
+  background:url("http://widget.meebo.com/ro.gif") no-repeat top right; 
 }
